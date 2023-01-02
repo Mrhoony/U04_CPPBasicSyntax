@@ -12,10 +12,10 @@ void AC02_Spawner::BeginPlay()
 	for (int32 i = 0; i < 4; i++)
 	{
 		FTransform transform;
-		transform.SetLocation(FVector(100 * i, 0, 0));
 
 		Meshes[i] = GetWorld()->SpawnActor<AC02_StaticMesh>(SpawnClasses[i], transform);
-
-		//Meshes[i]->
+		
+		FVector worldLocation = GetActorLocation();
+		Meshes[i]->SetActorLocation(FVector(worldLocation.X, worldLocation.Y + i * 200, worldLocation.Z));
 	}
 }
