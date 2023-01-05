@@ -21,8 +21,16 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
+	// Axis Mapping
 	void OnMoveForward(float InAxis);
 	void OnMoveRight(float InAxis);
+	
+	void OnHorizontalLook(float InAxis);
+	void OnVerticalLook(float InAxis);
+
+	// Action Mapping
+	void OnRun();
+	void OffRun();
 
 private:
 	UPROPERTY(VisibleDefaultsOnly)
