@@ -14,6 +14,14 @@ void AC03_LightTrigger::ActorBeginOverlap(AActor* OverlappedActor, AActor* Other
 	if (OnBoxBeginOverlap.IsBound())
 		OnBoxBeginOverlap.Execute();
 	// BroadCast ดย Multicast ภüฟ๋
+
+	if (OnBoxBeginRandomLightColor.IsBound())
+	{
+		FString str;
+		str = OnBoxBeginRandomLightColor.Execute(FLinearColor::MakeRandomColor());
+		str = "Random Color is " + str;
+		CLog::Log(str);
+	}
 }
 
 void AC03_LightTrigger::ActorEndOverlap(AActor* OverlappedActor, AActor* OtherActor)

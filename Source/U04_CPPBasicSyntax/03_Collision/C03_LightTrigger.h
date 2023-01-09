@@ -6,6 +6,7 @@
 
 DECLARE_DELEGATE(FBoxBeginOverlap); // void __()
 DECLARE_DELEGATE(FBoxEndOverlap); // void __()
+DECLARE_DELEGATE_RetVal_OneParam(FString, FBoxBeginRandomLightColor, FLinearColor); // FString __(FLinearColor)
 
 UCLASS()
 class U04_CPPBASICSYNTAX_API AC03_LightTrigger : public AC00_BoxBase
@@ -25,4 +26,5 @@ private:
 public: // 일반적으로 델리게이트 변수는 퍼블릭 영역에 지정 Get/Set 해도 되지만 복잡해진다
 	FBoxBeginOverlap OnBoxBeginOverlap;
 	FBoxEndOverlap OnBoxEndOverlap;
+	FBoxBeginRandomLightColor OnBoxBeginRandomLightColor;
 };
