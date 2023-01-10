@@ -18,11 +18,12 @@ protected:
 private:
 	UFUNCTION()
 		void OnStartFalling(int32 InIndex, FLinearColor InColor);
-	
+
 private:
 	UPROPERTY(VisibleDefaultsOnly)
 		class UStaticMeshComponent* Cubes[3];
 
 private:
 	FVector FirstLocations[3];
+
 };
