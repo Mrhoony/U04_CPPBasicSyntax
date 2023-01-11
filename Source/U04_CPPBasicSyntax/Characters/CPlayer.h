@@ -12,6 +12,9 @@ class U04_CPPBASICSYNTAX_API ACPlayer : public ACharacter
 public:
 	ACPlayer();
 
+	UFUNCTION(BlueprintCallable)
+		void ChangeBodyColor(FLinearColor InBodyColor, FLinearColor InLogoColor);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -38,4 +41,8 @@ private:
 
 	UPROPERTY(VisibleDefaultsOnly)
 		class UCameraComponent* Camera;
+
+private:
+	class UMaterialInstanceDynamic* BodyMaterialDynamic;
+	class UMaterialInstanceDynamic* LogoMaterialDynamic;
 };

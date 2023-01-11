@@ -4,6 +4,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Materials/MaterialInstanceConstant.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 ACPlayer::ACPlayer()
 {
@@ -44,6 +46,26 @@ void ACPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	UObject* obj;
+
+	// Body Material Asset
+	obj = StaticLoadObject(UMaterialInstanceConstant::StaticClass(), nullptr, TEXT("MaterialInstanceConstant'/Game/Character/Materials/M_UE4Man_Body_Inst.M_UE4Man_Body_Inst'"));
+
+	UMaterialInstanceConstant* bodyMaterialAsset = Cast<UMaterialInstanceConstant>(obj);
+	if (bodyMaterialAsset == nullptr) return;
+
+	// Logo Material Asset
+	obj = StaticLoadObject(UMaterialInstanceConstant::StaticClass(), nullptr, TEXT("MaterialInstanceConstant'/Game/Character/Materials/M_UE4Man_ChestLogo_Inst.M_UE4Man_ChestLogo_Inst'"));
+	UMaterialInstanceConstant* LogoMaterialAsset = Cast<UMaterialInstanceConstant>(obj);
+	if (LogoMaterialAsset == nullptr) return;
+
+	// Create Dynamic Material
+	BodyMaterialDynamic = UMaterialInstanceDynamic::Create(bodyMaterialAsset, nullptr);
+	LogoMaterialDynamic = UMaterialInstanceDynamic::Create(LogoMaterialAsset, nullptr);
+
+	// Set Material to SKelmeshComp
+	GetMesh()->SetMaterial(0, BodyMaterialDynamic);
+	GetMesh()->SetMaterial(1, LogoMaterialDynamic);
 }
 
 void ACPlayer::Tick(float DeltaTime)
@@ -100,4 +122,10 @@ void ACPlayer::OnRun()
 void ACPlayer::OffRun()
 {
 	GetCharacterMovement()->MaxWalkSpeed = 400.f;
+}
+
+void ACPlayer::ChangeBodyColor(FLinearColor InBodyColor, FLinearColor InLogoColor)
+{
+	BodyMaterialDynamic->SetVectorParameterValue("BodyColor", InBodyColor);
+	LogoMaterialDynamic->SetVectorParameterValue("BodyColor", InLogoColor);
 }

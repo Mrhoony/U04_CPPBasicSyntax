@@ -22,4 +22,8 @@ private:
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 		void SetBodyColor();
+
+	UFUNCTION(BlueprintNativeEvent)
+		void ResetBodyColor();
+	void ResetBodyColor_Implementation(); // 인텔리센스 빨간줄을 제거하기 위한 용도
 };
