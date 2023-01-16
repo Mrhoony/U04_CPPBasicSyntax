@@ -2,17 +2,20 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "IRifle.h"
 #include "CPlayer.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractEvent);
 
 UCLASS()
-class U04_CPPBASICSYNTAX_API ACPlayer : public ACharacter
+class U04_CPPBASICSYNTAX_API ACPlayer : public ACharacter, public IIRifle
 {
 	GENERATED_BODY()
 
 public:
 	ACPlayer();
+
+	FORCEINLINE class ACRifle* GetRifle() override { return Rifle; };
 
 	UFUNCTION(BlueprintCallable)
 		void ChangeBodyColor(FLinearColor InBodyColor, FLinearColor InLogoColor);
@@ -52,4 +55,7 @@ private:
 
 public:
 	FInteractEvent OnInteractEvent;
+
+private:
+	class ACRifle* Rifle;
 };

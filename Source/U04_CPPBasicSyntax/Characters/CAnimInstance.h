@@ -17,6 +17,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Animation")
 		float Speed;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Animation")
+		bool bEquipped;
+
 private:
-	class ACPlayer* Player;
+	class ACharacter* OwnerCharacter;
 };

@@ -1,5 +1,7 @@
 #include "CPlayer.h"
+#include "Global.h"
 #include "CAnimInstance.h"
+#include "Weapons/CRifle.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
@@ -66,6 +68,9 @@ void ACPlayer::BeginPlay()
 	// Set Material to SKelmeshComp
 	GetMesh()->SetMaterial(0, BodyMaterialDynamic);
 	GetMesh()->SetMaterial(1, LogoMaterialDynamic);
+
+	// Spawn Rifle
+	Rifle = ACRifle::Spawn(GetWorld(), this);
 }
 
 void ACPlayer::Tick(float DeltaTime)
@@ -136,6 +141,10 @@ void ACPlayer::OnInteract()
 
 void ACPlayer::OnRifle()
 {
+	if (Rifle->IsEquipped() == false)
+		Rifle->Equip();
+	else
+		Rifle->Unequip();
 }
 
 void ACPlayer::ChangeBodyColor(FLinearColor InBodyColor, FLinearColor InLogoColor)
