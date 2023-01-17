@@ -2,10 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
-#include "CANS_Equip.generated.h"
+#include "CANS_Unequip.generated.h"
 
 UCLASS()
-class U04_CPPBASICSYNTAX_API UCANS_Equip : public UAnimNotifyState
+class U04_CPPBASICSYNTAX_API UCANS_Unequip : public UAnimNotifyState
 {
 	GENERATED_BODY()
 	

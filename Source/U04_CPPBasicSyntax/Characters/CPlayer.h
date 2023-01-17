@@ -23,6 +23,12 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+protected:
+	UFUNCTION(BlueprintImplementableEvent)
+		void ZoomIn();
+	UFUNCTION(BlueprintImplementableEvent)
+		void ZoomOut();
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
@@ -42,11 +48,15 @@ private:
 	void OnInteract();
 	void OnRifle();
 
+	void OnAim();
+	void OffAim();
+
 private:
 	UPROPERTY(VisibleDefaultsOnly)
 		class USpringArmComponent* SpringArm;
 
-	UPROPERTY(VisibleDefaultsOnly)
+protected:
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
 		class UCameraComponent* Camera;
 
 private:

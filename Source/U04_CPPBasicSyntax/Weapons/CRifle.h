@@ -16,9 +16,18 @@ public:
 	
 	FORCEINLINE bool IsEquipped() const { return bEquipped; }
 	FORCEINLINE bool IsEquipping() const { return bEquipping; }
+	FORCEINLINE bool IsAiming() const { return bAiming; }
+
+	void Begin_Aiming();
+	void End_Aiming();
 
 	void Equip();
+	void Begin_Equip();
+	void End_Equip();
+
 	void Unequip();
+	void Begin_Unequip();
+	void End_Unequip();
 
 protected:
 	virtual void BeginPlay() override;
@@ -46,4 +55,5 @@ private:
 
 	bool bEquipped;
 	bool bEquipping;
+	bool bAiming;
 };
