@@ -18,9 +18,14 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (OwnerCharacter == nullptr) return;
 
 	Speed = OwnerCharacter->GetVelocity().Size2D();
+	Direction = CalculateDirection(OwnerCharacter->GetVelocity(), OwnerCharacter->GetControlRotation());
+	//Pitch = OwnerCharacter->GetControlRotation().Pitch;
+	Pitch = OwnerCharacter->GetBaseAimRotation().Pitch;
+
 	IIRifle* rifleInterface = Cast<IIRifle>(OwnerCharacter);
 	if (rifleInterface != nullptr)
 	{
 		bEquipped = rifleInterface->GetRifle()->IsEquipped();
+		bAiming = rifleInterface->GetRifle()->IsAiming();
 	}	
 }

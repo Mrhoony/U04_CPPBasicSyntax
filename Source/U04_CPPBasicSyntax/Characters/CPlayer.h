@@ -16,6 +16,9 @@ public:
 	ACPlayer();
 
 	FORCEINLINE class ACRifle* GetRifle() override { return Rifle; };
+	void GetAimInfo(FVector& OutAimStart, FVector& OutAimEnd, FVector& OutAimDirection) override;
+	void OnTarget() override;
+	void OffTarget() override;
 
 	UFUNCTION(BlueprintCallable)
 		void ChangeBodyColor(FLinearColor InBodyColor, FLinearColor InLogoColor);
@@ -60,6 +63,10 @@ protected:
 		class UCameraComponent* Camera;
 
 private:
+	UPROPERTY(EditDefaultsOnly, Category = "Widget")
+		TSubclassOf<class UCUserWidget_Aim> AimWidgetClass;
+
+private:
 	class UMaterialInstanceDynamic* BodyMaterialDynamic;
 	class UMaterialInstanceDynamic* LogoMaterialDynamic;
 
@@ -68,4 +75,5 @@ public:
 
 private:
 	class ACRifle* Rifle;
+	class UCUserWidget_Aim* AimWidget;
 };

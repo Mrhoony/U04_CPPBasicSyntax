@@ -2,12 +2,14 @@
 #include "Global.h"
 #include "CAnimInstance.h"
 #include "Weapons/CRifle.h"
+#include "Widgets/CUserWidget_Aim.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Materials/MaterialInstanceConstant.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Blueprint/UserWidget.h"
 
 ACPlayer::ACPlayer()
 {
@@ -43,6 +45,11 @@ ACPlayer::ACPlayer()
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->MaxWalkSpeed = 400.f;
+
+	// Get Aim Widget ClassRef
+	ConstructorHelpers::FClassFinder<UCUserWidget_Aim> aimWidgetClass(TEXT("WidgetBlueprint'/Game/Widgets/WB_Aim.WB_Aim_C'"));
+	if (aimWidgetClass.Succeeded())
+		AimWidgetClass = aimWidgetClass.Class;
 }
 
 void ACPlayer::BeginPlay()
@@ -74,6 +81,11 @@ void ACPlayer::BeginPlay()
 	Rifle = ACRifle::Spawn(GetWorld(), this);
 
 	OnRifle();
+
+	// Create Aim Widget
+	AimWidget = CreateWidget<UCUserWidget_Aim, APlayerController>(GetController<APlayerController>(), AimWidgetClass);
+	AimWidget->AddToViewport();
+	AimWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void ACPlayer::Tick(float DeltaTime)
@@ -147,10 +159,15 @@ void ACPlayer::OnInteract()
 
 void ACPlayer::OnRifle()
 {
-	if (Rifle->IsEquipped() == false)
-		Rifle->Equip();
-	else
+	if (Rifle->IsEquipped())
+	{
+		OffAim();
+
 		Rifle->Unequip();
+		return;
+	}
+
+	Rifle->Equip();
 }
 
 void ACPlayer::OnAim()
@@ -165,6 +182,10 @@ void ACPlayer::OnAim()
 	SpringArm->SocketOffset = FVector(0, 30, 10);
 
 	ZoomIn();
+
+	Rifle->Begin_Aiming();
+
+	AimWidget->SetVisibility(ESlateVisibility::Visible);
 }
 
 void ACPlayer::OffAim()
@@ -179,6 +200,32 @@ void ACPlayer::OffAim()
 	SpringArm->SocketOffset = FVector(0, 60, 0);
 
 	ZoomOut();
+
+	Rifle->End_Aiming();
+
+	AimWidget->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void ACPlayer::GetAimInfo(FVector& OutAimStart, FVector& OutAimEnd, FVector& OutAimDirection)
+{
+	OutAimDirection = Camera->GetForwardVector();
+
+	FTransform transform = Camera->GetComponentToWorld();
+	OutAimStart = transform.GetLocation() + OutAimDirection * 100.f;
+
+	FVector recoilCone = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(OutAimDirection, 0.2f);
+
+	OutAimEnd = OutAimStart + recoilCone * 3000;
+}
+
+void ACPlayer::OnTarget()
+{
+	AimWidget->OnTarget();
+}
+
+void ACPlayer::OffTarget()
+{
+	AimWidget->OffTarget();
 }
 
 void ACPlayer::ChangeBodyColor(FLinearColor InBodyColor, FLinearColor InLogoColor)

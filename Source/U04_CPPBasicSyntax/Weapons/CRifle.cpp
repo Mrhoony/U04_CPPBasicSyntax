@@ -1,5 +1,6 @@
 #include "CRifle.h"
 #include "Global.h"
+#include "Characters/IRifle.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Character.h"
 #include "Animation/AnimMontage.h"
@@ -95,4 +96,21 @@ void ACRifle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bAiming == false) return;
+
+	IIRifle* rifleInterface = Cast<IIRifle>(OwnerCharacter);
+	if (rifleInterface == nullptr) return;
+
+	FVector start, end, direction;
+	rifleInterface->GetAimInfo(start, end, direction);
+	//DrawDebugLine(GetWorld(), start, end, FColor::Red);
+
+	FHitResult hitResult;
+	FCollisionQueryParams collisionQueryParams;
+	collisionQueryParams.AddIgnoredActor(this);
+	collisionQueryParams.AddIgnoredActor(OwnerCharacter);
+	if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_PhysicsBody, collisionQueryParams))
+	{
+		// 라인에 닿았을 때 무엇을 할 것인지?
+	}
 }
