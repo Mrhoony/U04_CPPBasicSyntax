@@ -29,6 +29,11 @@ public:
 	void Begin_Unequip();
 	void End_Unequip();
 
+	void Begin_Fire();
+	void End_Fire();
+
+	void Firing();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -46,6 +51,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Montages")
 		class UAnimMontage* UngrabMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "CameraShake")
+		TSubclassOf<class UCameraShake> CameraShakeClass;
+
 private:
 	UPROPERTY(VisibleDefaultsOnly)
 		class USkeletalMeshComponent* Mesh;
@@ -56,4 +64,5 @@ private:
 	bool bEquipped;
 	bool bEquipping;
 	bool bAiming;
+	bool bFiring;
 };

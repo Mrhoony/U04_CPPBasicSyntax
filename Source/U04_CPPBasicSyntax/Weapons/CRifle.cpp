@@ -1,9 +1,11 @@
 #include "CRifle.h"
 #include "Global.h"
 #include "Characters/IRifle.h"
+#include "Characters/CPlayer.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Character.h"
 #include "Animation/AnimMontage.h"
+#include "Engine/StaticMeshActor.h"
 
 ACRifle::ACRifle()
 {
@@ -22,6 +24,9 @@ ACRifle::ACRifle()
 	if (ungrabMontageAsset.Succeeded())
 		UngrabMontage = ungrabMontageAsset.Object;
 	
+	ConstructorHelpers::FClassFinder<UCameraShake> cameraShakeAsset(TEXT("Blueprint'/Game/Weapons/BP_CameraShake.BP_CameraShake_C'"));
+	if (cameraShakeAsset.Succeeded())
+		CameraShakeClass = cameraShakeAsset.Class;
 }
 
 ACRifle* ACRifle::Spawn(UWorld* InWorld, ACharacter* InOwnerCharacter)
@@ -83,6 +88,65 @@ void ACRifle::End_Unequip()
 	bEquipping = false;
 }
 
+void ACRifle::Begin_Fire()
+{
+	if (bEquipped == false) return;
+	if (bEquipping == true) return;
+	if (bAiming == false) return;
+	if (bFiring == true) return;
+
+	bFiring = true;
+
+	Firing();
+}
+
+void ACRifle::End_Fire()
+{
+	bFiring = false;
+}
+
+void ACRifle::Firing()
+{
+	// Camera Shake
+	ACPlayer* player = Cast<ACPlayer>(OwnerCharacter);
+	if (player != nullptr)
+	{
+		APlayerController* controller = player->GetController<APlayerController>();
+
+		if(CameraShakeClass != nullptr)
+		controller->PlayerCameraManager->PlayCameraShake(CameraShakeClass);
+	}
+
+	IIRifle* rifleInterface = Cast<IIRifle>(OwnerCharacter);
+	if (rifleInterface == nullptr) return;
+
+	FVector start, end, direction;
+	rifleInterface->GetAimInfo(start, end, direction);
+
+	FHitResult hitResult;
+	FCollisionQueryParams collisionQueryParams;
+	collisionQueryParams.AddIgnoredActor(this);
+	collisionQueryParams.AddIgnoredActor(OwnerCharacter);
+	if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_Visibility, collisionQueryParams))
+	{
+		AStaticMeshActor* staticMeshActor = Cast<AStaticMeshActor>(hitResult.GetActor());
+		if (staticMeshActor != nullptr)
+		{
+			UStaticMeshComponent* staticMeshComp = Cast<UStaticMeshComponent>(staticMeshActor->GetRootComponent());
+			if (staticMeshComp != nullptr)
+			{
+				if (staticMeshComp->BodyInstance.bSimulatePhysics == true)
+				{
+					direction = staticMeshActor->GetActorLocation() - OwnerCharacter->GetActorLocation();
+					direction.Normalize();
+					staticMeshComp->AddImpulseAtLocation(direction * 30000.f, OwnerCharacter->GetActorLocation());
+					return;
+				} // if (staticMeshComp->BodyInstance.bSimulatePhysics == true)
+			} // if (staticMeshComp != nullptr)
+		} // if (staticMeshActor != nullptr)
+	} // if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_PhysicsBody, collisionQueryParams))
+}
+
 void ACRifle::BeginPlay()
 {
 	Super::BeginPlay();
@@ -111,6 +175,20 @@ void ACRifle::Tick(float DeltaTime)
 	collisionQueryParams.AddIgnoredActor(OwnerCharacter);
 	if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_PhysicsBody, collisionQueryParams))
 	{
-		// 라인에 닿았을 때 무엇을 할 것인지?
-	}
+		AStaticMeshActor* staticMeshActor = Cast<AStaticMeshActor>(hitResult.GetActor());
+		if (staticMeshActor != nullptr)
+		{
+			UStaticMeshComponent* staticMeshComp = Cast<UStaticMeshComponent>(staticMeshActor->GetRootComponent());
+			if (staticMeshComp != nullptr)
+			{
+				if (staticMeshComp->BodyInstance.bSimulatePhysics == true)
+				{
+					rifleInterface->OnTarget();
+					return;
+				} // if (staticMeshComp->BodyInstance.bSimulatePhysics == true)
+			} // if (staticMeshComp != nullptr)
+		} // if (staticMeshActor != nullptr)
+	} // if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_PhysicsBody, collisionQueryParams))
+
+	rifleInterface->OffTarget();
 }
