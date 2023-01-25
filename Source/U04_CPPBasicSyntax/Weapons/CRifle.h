@@ -18,6 +18,10 @@ public:
 	FORCEINLINE bool IsEquipping() const { return bEquipping; }
 	FORCEINLINE bool IsAiming() const { return bAiming; }
 
+	FORCEINLINE bool IsFiring() const { return bFiring; }
+	FORCEINLINE bool IsAutoFire() const { return bAutoFire; }
+	FORCEINLINE void ToggleAutoFire() { bAutoFire = !bAutoFire; }
+
 	void Begin_Aiming();
 	void End_Aiming();
 
@@ -41,6 +45,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
+	UPROPERTY(EditDefaultsOnly, Category = "Bullet")
+		TSubclassOf<class ACBullet> BulletClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Bullet")
+		float PitchSpeed = 0.25f;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Socket")
 		FName HolsterSocket = "Holster_Rifle";
 	UPROPERTY(EditDefaultsOnly, Category = "Socket")
@@ -54,6 +64,22 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "CameraShake")
 		TSubclassOf<class UCameraShake> CameraShakeClass;
 
+	// ÃÑ±¸ È­¿°
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+		class UParticleSystem* FlashParticle;
+	// ÅºÇÇ
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+		class UParticleSystem* EjectParticle;
+	// ÇÇ°Ý ½Ã
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+		class UParticleSystem* ImpactParticle;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+		class USoundCue* FireSoundCue;
+	// µ¥Ä®
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+		class UMaterialInstanceConstant* DecalMaterial;
+
 private:
 	UPROPERTY(VisibleDefaultsOnly)
 		class USkeletalMeshComponent* Mesh;
@@ -61,8 +87,13 @@ private:
 private:
 	class ACharacter* OwnerCharacter;
 
+	float CurrentPitch;
+
 	bool bEquipped;
 	bool bEquipping;
 	bool bAiming;
 	bool bFiring;
+	bool bAutoFire;
+
+	FTimerHandle AutoFireTimer;
 };
